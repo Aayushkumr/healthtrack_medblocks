@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState, useEffect } from 'react';
 import { useDatabaseContext } from '../context/DatabaseContext';
 import { getAllPatients, searchPatientsByName } from '../services/DatabaseService';
@@ -82,6 +83,7 @@ const PatientList: React.FC = () => {
     if (!isoDate) return 'N/A';
     try {
       return new Date(isoDate).toLocaleDateString();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
       return isoDate;
     }

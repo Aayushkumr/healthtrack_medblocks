@@ -1,12 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// src/services/DatabaseService.ts
-interface PGliteWorker {
+
+import { PGliteWorker } from '@electric-sql/pglite/worker';
+
+interface PGliteWorkerInterface {
   query: (sql: string, params?: any[]) => Promise<any>;
 }
 
-let db: PGliteWorker | null = null;
+let db: PGliteWorkerInterface | null = null;
 
-const initSchema = async (database: PGliteWorker) => {
+const initSchema = async (database: PGliteWorkerInterface) => {
   await database.query(`
     CREATE TABLE IF NOT EXISTS patients (
       id SERIAL PRIMARY KEY,
@@ -31,76 +33,79 @@ const initSchema = async (database: PGliteWorker) => {
   console.log("Database schema initialized");
 };
 
-export const initDatabase = async (): Promise<PGliteWorker> => {
+export const initDatabase = async (): Promise<PGliteWorkerInterface> => {
   if (!db) {
+    console.log("Starting database initialization");
+    
     try {
-      const PGliteWorker = new Worker('/pglite-worker.js', { type: 'module' });
-      db = {
-        query: async (sql: string, params: any[] = []) => {
-          const id = Math.random().toString(36).slice(2);
-          
-          return new Promise((resolve, reject) => {
-            const handler = (e: MessageEvent) => {
-              if (e.data.id !== id) return;
-              PGliteWorker.removeEventListener('message', handler);
-              if (e.data.error) {
-                reject(new Error(e.data.error));
-              } else {
-                resolve(e.data.result);
-              }
-            };
-            
-            PGliteWorker.addEventListener('message', handler);
-            PGliteWorker.postMessage({ id, sql, params });
-          });
-        }
-      };
+
+      const workerInstance = new Worker(new URL('/pglite-worker.js', import.meta.url), {
+        type: 'module',
+      });
       
+
+      db = new PGliteWorker(workerInstance);
+      
+      // Initialize schema
+      console.log("Starting schema initialization");
       await initSchema(db);
+      console.log("Schema initialization completed");
+      
     } catch (error) {
       console.error('Failed to initialize PGlite:', error);
       throw error;
     }
   }
+  
   return db;
 };
 
 export const registerPatient = async (patientData: any): Promise<any> => {
-  const database = await initDatabase();
-  const {
-    first_name,
-    last_name,
-    date_of_birth,
-    gender,
-    email,
-    phone,
-    address,
-    medical_notes,
-    insurance_provider,
-    insurance_id,
-  } = patientData;
-
-  const result = await database.query(
-    `INSERT INTO patients 
-      (first_name, last_name, date_of_birth, gender, email, phone, address, medical_notes, insurance_provider, insurance_id) 
-     VALUES 
-      ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-     RETURNING id`,
-    [
+  console.log("Starting patient registration:", patientData);
+  try {
+    const database = await initDatabase();
+    console.log("Database initialized for registration");
+    
+    const {
       first_name,
       last_name,
       date_of_birth,
       gender,
-      email || null,
-      phone || null,
-      address || null,
-      medical_notes || null,
-      insurance_provider || null,
-      insurance_id || null,
-    ]
-  );
+      email,
+      phone,
+      address,
+      medical_notes,
+      insurance_provider,
+      insurance_id,
+    } = patientData;
 
-  return result.rows?.[0];
+    console.log("Executing INSERT query");
+    const result = await database.query(
+      `INSERT INTO patients 
+        (first_name, last_name, date_of_birth, gender, email, phone, address, medical_notes, insurance_provider, insurance_id) 
+       VALUES 
+        ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+       RETURNING id`,
+      [
+        first_name,
+        last_name,
+        date_of_birth,
+        gender,
+        email || null,
+        phone || null,
+        address || null,
+        medical_notes || null,
+        insurance_provider || null,
+        insurance_id || null,
+      ]
+    );
+
+    console.log("Query result:", result);
+    return result.rows?.[0];
+  } catch (error) {
+    console.error("Error in registerPatient:", error);
+    throw error;
+  }
 };
 
 export const getAllPatients = async (): Promise<any[]> => {

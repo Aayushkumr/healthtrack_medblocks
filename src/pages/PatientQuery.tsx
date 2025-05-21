@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import React, { useState } from 'react';
 import { useDatabaseContext } from '../context/DatabaseContext';
 import { executeQuery } from '../services/DatabaseService';

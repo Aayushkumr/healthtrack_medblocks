@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar.tsx';
 import Sidebar from './Sidebar.tsx';
+import DatabaseStatus from './DatabaseStatus.tsx';
 
 const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -16,8 +17,8 @@ const Layout: React.FC = () => {
             <Outlet />
           </div>
         </main>
+      <DatabaseStatus />
       </div>
-
     </div>
   );
 };

@@ -58,6 +58,7 @@ const PatientRegistration: React.FC = () => {
   };
 
   const validateForm = (): boolean => {
+    console.log("Validating form...");
     const newErrors: Partial<PatientFormData> = {};
     
     // Required fields
@@ -77,48 +78,61 @@ const PatientRegistration: React.FC = () => {
     }
     
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const isValid = Object.keys(newErrors).length === 0;
+    console.log("Form validation result:", isValid, newErrors);
+    return isValid;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Form submission started");
     
-    if (!validateForm() || !isInitialized) return;
+    if (!validateForm()) {
+      console.log("Form validation failed");
+      return;
+    }
     
+    if (!isInitialized) {
+      console.log("Database not initialized, cannot submit");
+      setSubmitStatus({
+        success: false,
+        message: 'Database is not yet initialized. Please try again in a moment.'
+      });
+      return;
+    }
+    
+    console.log("Setting isSubmitting to true");
     setIsSubmitting(true);
     setSubmitStatus(null);
     
     try {
-      await registerPatient(formData);
+      console.log("Calling registerPatient with data:", formData);
+      const result = await registerPatient(formData);
+      console.log("Registration successful:", result);
+      
       setSubmitStatus({
         success: true,
         message: 'Patient registered successfully!'
       });
       setFormData(initialFormData);
-    } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
       console.error('Error registering patient:', error);
       setSubmitStatus({
         success: false,
-        message: 'Failed to register patient. Please try again.'
+        message: `Failed to register patient: ${error.message || 'Unknown error'}`
       });
     } finally {
+      console.log("Setting isSubmitting to false");
       setIsSubmitting(false);
     }
   };
 
-  if (!isInitialized) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="page-transition">
       <header className="mb-6">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Register New Patient</h1>
-        <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+        <h1 className="text-3xl font-bold">Register New Patient</h1>
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
           Add a new patient to the healthcare system
         </p>
       </header>
@@ -150,15 +164,16 @@ const PatientRegistration: React.FC = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6 bg-white dark:bg-slate-800 shadow-md rounded-lg p-6">
-        <div className="border-b border-slate-200 dark:border-slate-700 pb-4 mb-4">
-          <h2 className="text-xl font-medium text-slate-900 dark:text-white">Personal Information</h2>
+      <form onSubmit={handleSubmit} className="space-y-6 bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+        {/* Personal Information */}
+        <div className="border-b border-gray-200 dark:border-gray-700 pb-4 mb-4">
+          <h2 className="text-xl font-medium">Personal Information</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* First Name */}
           <div className="form-group">
-            <label htmlFor="first_name" className="form-label">
+            <label htmlFor="first_name" className="block text-sm font-medium mb-1">
               First Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -167,7 +182,7 @@ const PatientRegistration: React.FC = () => {
               name="first_name"
               value={formData.first_name}
               onChange={handleChange}
-              className={`form-input ${errors.first_name ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+              className={`w-full p-2 border rounded-md ${errors.first_name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
             />
             {errors.first_name && (
               <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.first_name}</p>
@@ -176,7 +191,7 @@ const PatientRegistration: React.FC = () => {
 
           {/* Last Name */}
           <div className="form-group">
-            <label htmlFor="last_name" className="form-label">
+            <label htmlFor="last_name" className="block text-sm font-medium mb-1">
               Last Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -185,7 +200,7 @@ const PatientRegistration: React.FC = () => {
               name="last_name"
               value={formData.last_name}
               onChange={handleChange}
-              className={`form-input ${errors.last_name ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+              className={`w-full p-2 border rounded-md ${errors.last_name ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
             />
             {errors.last_name && (
               <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.last_name}</p>
@@ -194,7 +209,7 @@ const PatientRegistration: React.FC = () => {
 
           {/* Date of Birth */}
           <div className="form-group">
-            <label htmlFor="date_of_birth" className="form-label">
+            <label htmlFor="date_of_birth" className="block text-sm font-medium mb-1">
               Date of Birth <span className="text-red-500">*</span>
             </label>
             <input
@@ -203,7 +218,7 @@ const PatientRegistration: React.FC = () => {
               name="date_of_birth"
               value={formData.date_of_birth}
               onChange={handleChange}
-              className={`form-input ${errors.date_of_birth ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+              className={`w-full p-2 border rounded-md ${errors.date_of_birth ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
             />
             {errors.date_of_birth && (
               <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.date_of_birth}</p>
@@ -212,7 +227,7 @@ const PatientRegistration: React.FC = () => {
 
           {/* Gender */}
           <div className="form-group">
-            <label htmlFor="gender" className="form-label">
+            <label htmlFor="gender" className="block text-sm font-medium mb-1">
               Gender <span className="text-red-500">*</span>
             </label>
             <select
@@ -220,7 +235,7 @@ const PatientRegistration: React.FC = () => {
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className={`form-input ${errors.gender ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+              className={`w-full p-2 border rounded-md ${errors.gender ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
             >
               <option value="">Select Gender</option>
               <option value="Male">Male</option>
@@ -235,21 +250,22 @@ const PatientRegistration: React.FC = () => {
           </div>
         </div>
 
-        <div className="border-b border-slate-200 dark:border-slate-700 pb-4 mb-4 pt-4">
-          <h2 className="text-xl font-medium text-slate-900 dark:text-white">Contact Information</h2>
+        {/* Contact Information */}
+        <div className="border-b border-gray-200 dark:border-gray-700 pb-4 mb-4 pt-4">
+          <h2 className="text-xl font-medium">Contact Information</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Email */}
           <div className="form-group">
-            <label htmlFor="email" className="form-label">Email</label>
+            <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
             <input
               type="email"
               id="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`form-input ${errors.email ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+              className={`w-full p-2 border rounded-md ${errors.email ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
             />
             {errors.email && (
               <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email}</p>
@@ -258,14 +274,14 @@ const PatientRegistration: React.FC = () => {
 
           {/* Phone */}
           <div className="form-group">
-            <label htmlFor="phone" className="form-label">Phone</label>
+            <label htmlFor="phone" className="block text-sm font-medium mb-1">Phone</label>
             <input
               type="tel"
               id="phone"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className={`form-input ${errors.phone ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+              className={`w-full p-2 border rounded-md ${errors.phone ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
               placeholder="e.g. (123) 456-7890"
             />
             {errors.phone && (
@@ -275,34 +291,35 @@ const PatientRegistration: React.FC = () => {
 
           {/* Address */}
           <div className="form-group md:col-span-2">
-            <label htmlFor="address" className="form-label">Address</label>
+            <label htmlFor="address" className="block text-sm font-medium mb-1">Address</label>
             <input
               type="text"
               id="address"
               name="address"
               value={formData.address}
               onChange={handleChange}
-              className="form-input"
+              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md"
               placeholder="Street address, city, state, zip"
             />
           </div>
         </div>
 
-        <div className="border-b border-slate-200 dark:border-slate-700 pb-4 mb-4 pt-4">
-          <h2 className="text-xl font-medium text-slate-900 dark:text-white">Medical Information</h2>
+        {/* Medical Information */}
+        <div className="border-b border-gray-200 dark:border-gray-700 pb-4 mb-4 pt-4">
+          <h2 className="text-xl font-medium">Medical Information</h2>
         </div>
 
         <div className="grid grid-cols-1 gap-6">
           {/* Medical Notes */}
           <div className="form-group">
-            <label htmlFor="medical_notes" className="form-label">Medical Notes</label>
+            <label htmlFor="medical_notes" className="block text-sm font-medium mb-1">Medical Notes</label>
             <textarea
               id="medical_notes"
               name="medical_notes"
               value={formData.medical_notes}
               onChange={handleChange}
               rows={4}
-              className="form-input"
+              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md"
               placeholder="Any important medical information, allergies, etc."
             />
           </div>
@@ -310,44 +327,44 @@ const PatientRegistration: React.FC = () => {
           {/* Insurance Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="form-group">
-              <label htmlFor="insurance_provider" className="form-label">Insurance Provider</label>
+              <label htmlFor="insurance_provider" className="block text-sm font-medium mb-1">Insurance Provider</label>
               <input
                 type="text"
                 id="insurance_provider"
                 name="insurance_provider"
                 value={formData.insurance_provider}
                 onChange={handleChange}
-                className="form-input"
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md"
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="insurance_id" className="form-label">Insurance ID</label>
+              <label htmlFor="insurance_id" className="block text-sm font-medium mb-1">Insurance ID</label>
               <input
                 type="text"
                 id="insurance_id"
                 name="insurance_id"
                 value={formData.insurance_id}
                 onChange={handleChange}
-                className="form-input"
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md"
               />
             </div>
           </div>
         </div>
 
         {/* Form Buttons */}
-        <div className="flex justify-end space-x-3 pt-4 border-t border-slate-200 dark:border-slate-700">
+        <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
           <button
             type="button"
             onClick={() => setFormData(initialFormData)}
-            className="btn btn-outline"
+            className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-md"
             disabled={isSubmitting}
           >
             Reset
           </button>
           <button
             type="submit"
-            className="btn btn-primary"
+            className="px-4 py-2 bg-primary-600 text-white rounded-md"
             disabled={isSubmitting}
           >
             {isSubmitting ? (

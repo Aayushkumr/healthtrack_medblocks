@@ -1,10 +1,9 @@
-// src/App.tsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard';
-import PatientRegistration from './pages/PatientRegistration';
-import PatientQuery from './pages/PatientQuery';
-import PatientList from './pages/PatientList';
+import PatientRegistration from './pages/PatientRegistration.tsx';
+import PatientQuery from './pages/PatientQuery.tsx';
+import PatientList from './pages/PatientList.tsx';
 import { DatabaseProvider } from './context/DatabaseContext';
 import { ThemeProvider } from './context/ThemeContext';
 

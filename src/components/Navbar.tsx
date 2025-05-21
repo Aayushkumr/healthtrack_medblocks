@@ -44,10 +44,10 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick }) => {
             <div className="relative">
               <div className="flex items-center">
                 <div className="h-8 w-8 rounded-full bg-primary-600 dark:bg-primary-500 flex items-center justify-center text-white font-medium">
-                  DR
+                  AK
                 </div>
                 <span className="ml-2 text-sm font-medium text-slate-700 dark:text-slate-300 hidden md:block">
-                  Dr. Rivera
+                  Aayush Kumar
                 </span>
               </div>
             </div>

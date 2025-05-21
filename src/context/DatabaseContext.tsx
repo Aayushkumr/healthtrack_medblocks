@@ -22,13 +22,25 @@ export const DatabaseProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   useEffect(() => {
     const initialize = async () => {
+      console.log("Starting database context initialization");
+      
       try {
-        await initDatabase();
-        setIsInitialized(true);
+        setIsLoading(true);
         setError(null);
-      } catch (err) {
+        
+        // Give the UI a chance to render before starting heavy initialization
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        console.log("Calling initDatabase()");
+        await initDatabase();
+        
+        console.log("Database initialized successfully");
+        setIsInitialized(true);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (err: any) {
         console.error('Failed to initialize database:', err);
-        setError('Failed to initialize database. Please refresh the page and try again.');
+        setError(err.message || 'Unknown database initialization error');
+        setIsInitialized(false);
       } finally {
         setIsLoading(false);
       }
