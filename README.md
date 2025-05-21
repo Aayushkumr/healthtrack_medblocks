@@ -1,14 +1,19 @@
-
 # HealthTrack – Offline-First Patient Management System
-
 
 ## Overview
 
-**HealthTrack** is a modern, offline-first patient management system built for healthcare providers. It enables efficient registration, tracking, and management of patient data, even in environments with unreliable internet connectivity.
+**HealthTrack** is a modern offline-first patient management system built for healthcare providers. It enables efficient registration, tracking, and management of patient data, even in environments with unreliable internet connectivity.
 
-Built with a focus on user experience and data reliability, HealthTrack uses **PGlite**, a fully-featured SQL database that runs entirely in the browser.
+Designed with a focus on user experience and data reliability, HealthTrack uses **PGlite**, a fully featured SQL database that runs entirely in the browser.
 
 ---
+
+## Live Demo
+
+🔗 [View Deployed App](https://healthtrack-navy.vercel.app/)
+
+---
+
 
 ## Features
 
@@ -16,8 +21,8 @@ Built with a focus on user experience and data reliability, HealthTrack uses **P
 * **Patient List View** – Browse and search through registered patients
 * **SQL Query Interface** – Execute custom SQL queries on patient data
 * **Offline-First Architecture** – Full functionality without an internet connection
-* **Responsive Design** – Works seamlessly on desktop, tablet, and mobile
-* **Dark/Light Mode** – Automatic theme detection with manual toggle
+* **Responsive Design** – Optimized for desktop, tablet, and mobile
+* **Dark/Light Mode** – Auto-detects system theme with manual toggle
 * **Database Status Indicator** – Real-time feedback on database status
 
 ---
@@ -74,13 +79,13 @@ npm run build       # or pnpm build
                     # or yarn build
 ```
 
-The production build will be output to the `dist/` directory.
+The production build will be located in the `dist/` directory.
 
 ---
 
 ## Database Schema
 
-HealthTrack uses a simple yet comprehensive schema:
+HealthTrack uses a straightforward but comprehensive schema:
 
 ```sql
 CREATE TABLE patients (
@@ -134,14 +139,13 @@ healthtrack/
 
 ---
 
-
 ## Offline Functionality
 
-HealthTrack is designed to work entirely offline after the initial load. It:
+HealthTrack is designed to function entirely offline after the initial load. It:
 
 * Stores all patient data in the browser’s IndexedDB
 * Allows patient registration without an internet connection
-* Preserves full functionality offline
+* Maintains full functionality offline
 * Has no backend dependencies for core operations
 
 ---
@@ -150,39 +154,42 @@ HealthTrack is designed to work entirely offline after the initial load. It:
 
 ### Dashboard
 
-Provides quick access to core functions and displays key metrics.
+Provides access to key features and displays essential metrics.
 
 ### Patient Registration
 
-Fill out the registration form with required fields (marked with `*`) and optional details. Form validation ensures accurate data entry.
+Complete the form with all required fields (marked with `*`) and optional details. Built-in validation ensures accurate data entry.
 
 ### Patient List
 
-View and search through all registered patients. Information is presented in a clean, tabular format.
+Browse and search through registered patients. Data is displayed in a clean, tabular format.
 
 ### Query Interface
 
-Run custom SQL queries directly on patient data. Sample queries are included for common operations.
+Run custom SQL queries directly on patient data. Includes sample queries for common operations.
 
 ---
 
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch
+
+2. Create a feature branch:
 
    ```bash
    git checkout -b feature/your-feature-name
    ```
-3. Commit your changes
+
+3. Commit your changes:
 
    ```bash
    git commit -m "Describe your changes"
    ```
-4. Push the branch
+
+4. Push the branch:
 
    ```bash
    git push origin feature/your-feature-name
    ```
-5. Open a Pull Request
 
+5. Open a Pull Request
