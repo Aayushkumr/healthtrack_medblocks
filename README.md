@@ -45,7 +45,7 @@ Built with a focus on user experience and data reliability, HealthTrack uses **P
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/healthtrack.git
+   git clone https://github.com/Aayushkumr/healthtrack.git
    cd healthtrack
    ```
 
@@ -134,15 +134,6 @@ healthtrack/
 
 ---
 
-## Browser Support
-
-HealthTrack works in all modern browsers that support WebAssembly:
-
-* Chrome / Edge (latest 2 versions)
-* Firefox (latest 2 versions)
-* Safari (latest 2 versions)
-
----
 
 ## Offline Functionality
 
