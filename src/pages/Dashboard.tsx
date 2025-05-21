@@ -83,12 +83,12 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {/* Register Patients Card */}
-        <div className="bg-white dark:bg-slate-800 overflow-hidden shadow rounded-lg transition-colors duration-200">
+        <div className="card card-hover group">
           <div className="p-5">
             <div className="flex items-center">
-              <div className="flex-shrink-0 bg-accent-100 dark:bg-accent-900/50 rounded-md p-3">
+              <div className="flex-shrink-0 bg-accent-100 dark:bg-accent-900/50 rounded-md p-3 group-hover:bg-accent-200 dark:group-hover:bg-accent-800/50 transition-colors">
                 <UserPlus className="h-6 w-6 text-accent-600 dark:text-accent-400" />
               </div>
               <div className="ml-5 w-0 flex-1">
@@ -99,21 +99,24 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="bg-slate-50 dark:bg-slate-800/60 px-5 py-3 border-t border-slate-200 dark:border-slate-700">
+          <div className="bg-slate-50 dark:bg-slate-800/60 px-5 py-3 border-t border-slate-200 dark:border-slate-700 group-hover:bg-slate-100 dark:group-hover:bg-slate-700/50 transition-colors">
             <Link
               to="/register"
-              className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500"
+              className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 group-hover:translate-x-0.5 inline-flex items-center transform transition-transform"
             >
-              Register Patient →
+              Register Patient 
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
             </Link>
           </div>
         </div>
 
         {/* Query Patients Card */}
-        <div className="bg-white dark:bg-slate-800 overflow-hidden shadow rounded-lg transition-colors duration-200">
+        <div className="card card-hover group">
           <div className="p-5">
             <div className="flex items-center">
-              <div className="flex-shrink-0 bg-secondary-100 dark:bg-secondary-900/50 rounded-md p-3">
+              <div className="flex-shrink-0 bg-secondary-100 dark:bg-secondary-900/50 rounded-md p-3 group-hover:bg-secondary-200 dark:group-hover:bg-secondary-800/50 transition-colors">
                 <Search className="h-6 w-6 text-secondary-600 dark:text-secondary-400" />
               </div>
               <div className="ml-5 w-0 flex-1">
@@ -124,21 +127,24 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="bg-slate-50 dark:bg-slate-800/60 px-5 py-3 border-t border-slate-200 dark:border-slate-700">
+          <div className="bg-slate-50 dark:bg-slate-800/60 px-5 py-3 border-t border-slate-200 dark:border-slate-700 group-hover:bg-slate-100 dark:group-hover:bg-slate-700/50 transition-colors">
             <Link
               to="/query"
-              className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500"
+              className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:text-primary-500 group-hover:translate-x-0.5 inline-flex items-center transform transition-transform"
             >
-              Open Query Tool →
+              Open Query Tool 
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1 group-hover:translate-x-0.5 transition-transform" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd" />
+              </svg>
             </Link>
           </div>
         </div>
 
         {/* Database Info Card */}
-        <div className="bg-white dark:bg-slate-800 overflow-hidden shadow rounded-lg transition-colors duration-200">
+        <div className="card card-hover group">
           <div className="p-5">
             <div className="flex items-center">
-              <div className="flex-shrink-0 bg-green-100 dark:bg-green-900/50 rounded-md p-3">
+              <div className="flex-shrink-0 bg-green-100 dark:bg-green-900/50 rounded-md p-3 group-hover:bg-green-200 dark:group-hover:bg-green-800/50 transition-colors">
                 <Database className="h-6 w-6 text-green-600 dark:text-green-400" />
               </div>
               <div className="ml-5 w-0 flex-1">
@@ -149,7 +155,7 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="bg-slate-50 dark:bg-slate-800/60 px-5 py-3 border-t border-slate-200 dark:border-slate-700">
+          <div className="bg-slate-50 dark:bg-slate-800/60 px-5 py-3 border-t border-slate-200 dark:border-slate-700 group-hover:bg-slate-100 dark:group-hover:bg-slate-700/50 transition-colors">
             <div className="text-sm font-medium text-green-600 dark:text-green-400">
               Connected • Data stored locally
             </div>

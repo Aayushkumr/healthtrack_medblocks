@@ -1,9 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useDatabaseContext } from '../context/DatabaseContext';
 import { getAllPatients, searchPatientsByName } from '../services/DatabaseService';
-import { Search, FileDown, AlertCircle } from 'lucide-react';
+import { Users, UserPlus, Search, Mail, Phone, Database } from 'lucide-react';
+import LoadingState from '../components/LoadingState.tsx';
+import EmptyState from '../components/EmptyState.tsx';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 interface Patient {
   id: number;
   first_name: string;
@@ -26,213 +29,220 @@ const PatientList: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchPatients = async () => {
+  useEffect(() => {
+    const loadPatients = async () => {
+      if (!isInitialized) return;
+      
+      setIsLoading(true);
+      try {
+        const data = await getAllPatients();
+        setPatients(data);
+        setError(null);
+      } catch (err: any) {
+        console.error('Failed to load patients:', err);
+        setError(err.message || 'Failed to load patients');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadPatients();
+  }, [isInitialized]);
+
+  const handleSearch = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    
     if (!isInitialized) return;
     
-    setIsLoading(true);
-    setError(null);
+    if (value.trim() === '') {
+      // If search is cleared, load all patients
+      const allPatients = await getAllPatients();
+      setPatients(allPatients);
+      return;
+    }
     
     try {
-      let result: Patient[];
-      if (searchTerm) {
-        result = await searchPatientsByName(searchTerm);
-      } else {
-        result = await getAllPatients();
-      }
-      setPatients(result);
+      setIsLoading(true);
+      const results = await searchPatientsByName(value);
+      setPatients(results);
+      setError(null);
     } catch (err: any) {
-      console.error('Error fetching patients:', err);
-      setError(err.message || 'Failed to load patients');
+      console.error('Search error:', err);
+      setError(err.message || 'Failed to search patients');
     } finally {
       setIsLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchPatients();
-  }, [isInitialized]);
-
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    fetchPatients();
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
-  };
-
-  const exportPatients = () => {
-    // Create a JSON blob
-    const jsonData = JSON.stringify(patients, null, 2);
-    const blob = new Blob([jsonData], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    // Create a downloadable link
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `patients-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    
-    // Clean up
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const formatDate = (isoDate: string) => {
-    if (!isoDate) return 'N/A';
+  const formatDate = (dateString: string): string => {
+    if (!dateString) return 'N/A';
     try {
-      return new Date(isoDate).toLocaleDateString();
+      const date = new Date(dateString);
+      return date.toLocaleDateString();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (e) {
-      return isoDate;
+    } catch (err) {
+      return dateString;
     }
   };
 
   if (!isInitialized) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+      <div className="page-transition">
+        <header className="page-header">
+          <h1 className="page-title">Patient List</h1>
+          <p className="page-subtitle">View and manage all registered patients</p>
+        </header>
+        
+        <EmptyState
+          icon={<Database className="h-12 w-12" />}
+          title="Database Initializing"
+          description="Please wait while the database is being initialized."
+        />
       </div>
     );
   }
 
   return (
     <div className="page-transition">
-      <header className="mb-6">
+      <header className="page-header">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Patient List</h1>
-            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-              View and search all registered patients
-            </p>
+            <h1 className="page-title">Patient List</h1>
+            <p className="page-subtitle">View and manage all registered patients</p>
           </div>
           <div className="mt-4 md:mt-0">
-            <button
-              onClick={exportPatients}
-              disabled={patients.length === 0 || isLoading}
-              className="btn btn-outline flex items-center"
-            >
-              <FileDown className="h-4 w-4 mr-2" />
-              Export JSON
-            </button>
+            <Link to="/register" className="btn btn-primary btn-icon">
+              <UserPlus className="mr-2 h-4 w-4" />
+              Register New Patient
+            </Link>
           </div>
         </div>
       </header>
 
-      <div className="mb-6">
-        <form onSubmit={handleSearch} className="flex">
-          <div className="relative flex-grow">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search className="h-5 w-5 text-slate-400" />
-            </div>
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={handleSearchChange}
-              placeholder="Search by name..."
-              className="form-input pl-10 pr-4 py-2 w-full rounded-l-md border-r-0"
-            />
+      <div className="card mb-6">
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Search className="h-5 w-5 text-gray-400" />
           </div>
-          <button
-            type="submit"
-            className="btn btn-primary rounded-l-none"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Searching...' : 'Search'}
-          </button>
-        </form>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={handleSearch}
+            placeholder="Search patients by name..."
+            className="form-input pl-10"
+          />
+        </div>
       </div>
 
       {error && (
-        <div className="mb-6 bg-red-50 dark:bg-red-900/20 border-l-4 border-red-500 p-4 rounded-md">
+        <div className="bg-red-50 dark:bg-red-900/20 border-l-4 border-red-600 p-4 rounded-md mb-6">
           <div className="flex">
-            <div className="flex-shrink-0">
-              <AlertCircle className="h-5 w-5 text-red-400" />
-            </div>
             <div className="ml-3">
-              <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+              <h3 className="text-red-800 dark:text-red-300 font-medium">Error</h3>
+              <p className="text-red-700 dark:text-red-400 text-sm">{error}</p>
             </div>
           </div>
         </div>
       )}
 
       {isLoading ? (
-        <div className="flex justify-center items-center h-32">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-600"></div>
-        </div>
+        <LoadingState message="Loading patients..." />
       ) : (
-        <div className="table-container">
-          {patients.length === 0 ? (
-            <div className="bg-white dark:bg-slate-800 p-6 text-center rounded-lg shadow-md">
-              <p className="text-slate-600 dark:text-slate-400">
-                {searchTerm 
-                  ? `No patients found matching "${searchTerm}"`
-                  : "No patients have been registered yet"}
-              </p>
-            </div>
-          ) : (
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Name</th>
-                  <th>Gender</th>
-                  <th>Date of Birth</th>
-                  <th>Contact</th>
-                  <th>Insurance</th>
-                  <th>Registered</th>
-                </tr>
-              </thead>
-              <tbody>
-                {patients.map((patient) => (
-                  <tr key={patient.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors duration-150">
-                    <td>{patient.id}</td>
-                    <td>
-                      <div className="font-medium text-slate-900 dark:text-white">
-                        {patient.first_name} {patient.last_name}
-                      </div>
-                    </td>
-                    <td>{patient.gender}</td>
-                    <td>{formatDate(patient.date_of_birth)}</td>
-                    <td>
-                      {patient.email ? (
-                        <div className="text-xs text-slate-600 dark:text-slate-400">
-                          <div>{patient.email}</div>
-                          {patient.phone && <div className="mt-1">{patient.phone}</div>}
-                        </div>
-                      ) : patient.phone ? (
-                        <div className="text-xs">{patient.phone}</div>
-                      ) : (
-                        <span className="text-xs text-slate-400 dark:text-slate-500">No contact</span>
-                      )}
-                    </td>
-                    <td>
-                      {patient.insurance_provider ? (
-                        <div className="text-xs text-slate-600 dark:text-slate-400">
-                          <div>{patient.insurance_provider}</div>
-                          {patient.insurance_id && (
-                            <div className="text-xs opacity-80 mt-1">ID: {patient.insurance_id}</div>
+        <div className="overflow-x-auto -mx-4 sm:-mx-6 lg:-mx-8">
+          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+            <div className="table-container">
+              {patients.length === 0 ? (
+                <EmptyState
+                  icon={<Users className="h-12 w-12" />}
+                  title={searchTerm ? "No matching patients found" : "No patients registered yet"}
+                  description={searchTerm 
+                    ? `No patients found matching "${searchTerm}"`
+                    : "Register a new patient to get started"}
+                  action={
+                    !searchTerm && (
+                      <Link to="/register" className="btn btn-primary btn-icon">
+                        <UserPlus className="mr-2 h-4 w-4" />
+                        Register First Patient
+                      </Link>
+                    )
+                  }
+                />
+              ) : (
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th className="rounded-tl-lg">ID</th>
+                      <th>Name</th>
+                      <th>Gender</th>
+                      <th>Date of Birth</th>
+                      <th>Contact</th>
+                      <th>Insurance</th>
+                      <th className="rounded-tr-lg">Registered</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {patients.map((patient) => (
+                      <tr key={patient.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors duration-150">
+                        <td>{patient.id}</td>
+                        <td>
+                          <div className="font-medium text-slate-900 dark:text-white">
+                            {patient.first_name} {patient.last_name}
+                          </div>
+                        </td>
+                        <td>
+                          <span className={`status-badge ${
+                            patient.gender === 'Male' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' :
+                            patient.gender === 'Female' ? 'bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300' :
+                            'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
+                          }`}>
+                            {patient.gender}
+                          </span>
+                        </td>
+                        <td>{formatDate(patient.date_of_birth)}</td>
+                        <td>
+                          <div className="space-y-1">
+                            {patient.email && (
+                              <div className="flex items-center text-xs">
+                                <Mail className="h-3 w-3 mr-1 text-slate-400" />
+                                <span>{patient.email}</span>
+                              </div>
+                            )}
+                            {patient.phone && (
+                              <div className="flex items-center text-xs">
+                                <Phone className="h-3 w-3 mr-1 text-slate-400" />
+                                <span>{patient.phone}</span>
+                              </div>
+                            )}
+                            {!patient.email && !patient.phone && (
+                              <span className="text-xs text-slate-400">No contact info</span>
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          {patient.insurance_provider ? (
+                            <div>
+                              <div className="font-medium">{patient.insurance_provider}</div>
+                              {patient.insurance_id && (
+                                <div className="text-xs text-slate-500">ID: {patient.insurance_id}</div>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-xs text-slate-400">No insurance</span>
                           )}
-                        </div>
-                      ) : (
-                        <span className="text-xs text-slate-400 dark:text-slate-500">Not provided</span>
-                      )}
-                    </td>
-                    <td className="text-xs">
-                      {formatDate(patient.created_at)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+                        </td>
+                        <td className="text-xs">
+                          {formatDate(patient.created_at)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
         </div>
       )}
-
-      <div className="mt-4 text-xs text-slate-500 dark:text-slate-400">
-        Total records: {patients.length}
-      </div>
     </div>
   );
 };

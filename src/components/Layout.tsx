@@ -17,7 +17,7 @@ const Layout: React.FC = () => {
             <Outlet />
           </div>
         </main>
-      <DatabaseStatus />
+        <DatabaseStatus />
       </div>
     </div>
   );

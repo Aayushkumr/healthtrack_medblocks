@@ -1,54 +1,197 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# HealthTrack – Offline-First Patient Management System
 
-Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Overview
 
-## Expanding the ESLint configuration
+**HealthTrack** is a modern, offline-first patient management system built for healthcare providers. It enables efficient registration, tracking, and management of patient data, even in environments with unreliable internet connectivity.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Built with a focus on user experience and data reliability, HealthTrack uses **PGlite**, a fully-featured SQL database that runs entirely in the browser.
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+---
+
+## Features
+
+* **Patient Registration** – Collect and store comprehensive patient details
+* **Patient List View** – Browse and search through registered patients
+* **SQL Query Interface** – Execute custom SQL queries on patient data
+* **Offline-First Architecture** – Full functionality without an internet connection
+* **Responsive Design** – Works seamlessly on desktop, tablet, and mobile
+* **Dark/Light Mode** – Automatic theme detection with manual toggle
+* **Database Status Indicator** – Real-time feedback on database status
+
+---
+
+## Technology Stack
+
+* **Frontend** – React 19, TypeScript
+* **Database** – PGlite (SQLite compiled to WebAssembly)
+* **Build Tool** – Vite
+* **Styling** – Tailwind CSS
+* **Icons** – Lucide React
+* **Routing** – React Router v7
+
+---
+
+## Installation
+
+### Prerequisites
+
+* Node.js 18
+* npm / pnpm / yarn
+
+### Setup
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/yourusername/healthtrack.git
+   cd healthtrack
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install      # or pnpm install
+                    # or yarn install
+   ```
+
+3. Start the development server:
+
+   ```bash
+   npm run dev      # or pnpm dev
+                    # or yarn dev
+   ```
+
+4. Open your browser and navigate to `http://localhost:5173`
+
+---
+
+## Building for Production
+
+```bash
+npm run build       # or pnpm build
+                    # or yarn build
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The production build will be output to the `dist/` directory.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+---
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+## Database Schema
+
+HealthTrack uses a simple yet comprehensive schema:
+
+```sql
+CREATE TABLE patients (
+  id SERIAL PRIMARY KEY,
+  first_name TEXT NOT NULL,
+  last_name TEXT NOT NULL,
+  date_of_birth TEXT NOT NULL,
+  gender TEXT NOT NULL,
+  email TEXT,
+  phone TEXT,
+  address TEXT,
+  medical_notes TEXT,
+  insurance_provider TEXT,
+  insurance_id TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 ```
+
+---
+
+## Application Structure
+
+```
+healthtrack/
+├── public/                  # Static assets and PGlite worker
+│   └── pglite-worker.js     # Worker script for PGlite
+├── src/
+│   ├── components/          # Reusable UI components
+│   │   ├── DatabaseStatus.tsx
+│   │   ├── EmptyState.tsx
+│   │   ├── Layout.tsx
+│   │   ├── LoadingState.tsx
+│   │   ├── Navbar.tsx
+│   │   └── Sidebar.tsx
+│   ├── context/             # React context providers
+│   │   └── DatabaseContext.tsx
+│   ├── pages/               # Page components
+│   │   ├── Dashboard.tsx
+│   │   ├── PatientList.tsx
+│   │   ├── PatientQuery.tsx
+│   │   └── PatientRegistration.tsx
+│   ├── services/            # Business logic and API
+│   │   └── DatabaseService.ts
+│   ├── App.tsx              # Main application component
+│   ├── index.css            # Global styles
+│   └── main.tsx             # Entry point
+├── package.json             # Dependencies and scripts
+├── tsconfig.json            # TypeScript configuration
+└── vite.config.ts           # Vite configuration
+```
+
+---
+
+## Browser Support
+
+HealthTrack works in all modern browsers that support WebAssembly:
+
+* Chrome / Edge (latest 2 versions)
+* Firefox (latest 2 versions)
+* Safari (latest 2 versions)
+
+---
+
+## Offline Functionality
+
+HealthTrack is designed to work entirely offline after the initial load. It:
+
+* Stores all patient data in the browser’s IndexedDB
+* Allows patient registration without an internet connection
+* Preserves full functionality offline
+* Has no backend dependencies for core operations
+
+---
+
+## Usage Guide
+
+### Dashboard
+
+Provides quick access to core functions and displays key metrics.
+
+### Patient Registration
+
+Fill out the registration form with required fields (marked with `*`) and optional details. Form validation ensures accurate data entry.
+
+### Patient List
+
+View and search through all registered patients. Information is presented in a clean, tabular format.
+
+### Query Interface
+
+Run custom SQL queries directly on patient data. Sample queries are included for common operations.
+
+---
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+3. Commit your changes
+
+   ```bash
+   git commit -m "Describe your changes"
+   ```
+4. Push the branch
+
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+5. Open a Pull Request
+
